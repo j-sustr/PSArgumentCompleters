@@ -1,0 +1,2 @@
+
+Install-ModuleForCurrentUser $PSScriptRoot\src
