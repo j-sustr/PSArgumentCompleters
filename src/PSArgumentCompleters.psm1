@@ -25,6 +25,21 @@ class MemoCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterF
     }
 }
 
+class EnumCompleter : IArgumentCompleter {
+
+}
+
+class EnumCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterFactory {
+
+
+    NumberCompletionsAttribute([string[]] $values) {
+        $this.Values = $values
+    }
+
+    [IArgumentCompleter] Create() { return [EnumCompleter]::new($this.Values) }
+}
+
+
 class NumberCompleter : IArgumentCompleter {
 
     [int] $From
