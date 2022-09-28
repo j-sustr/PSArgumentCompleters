@@ -6,12 +6,21 @@ using namespace PSMemo.Completers;
 
 class MemoCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterFactory {
     [string] $Key;
+    [ScriptBlock] $KeyResolver;
 
     MemoCompletionsAttribute([string] $key) {
-        $this.Key = [string]::new($key)
+        $this.Key = $key
+    }
+
+    MemoCompletionsAttribute([ScriptBlock] $keyResolver) {
+        $this.KeyResolver = $keyResolver
     }
 
     [IArgumentCompleter] Create() {
+        if ($this.KeyResolver) {
+            return [MemoCompleter]::new($this.KeyResolver)
+        }
+
         return [MemoCompleter]::new($this.Key)
     }
 }
