@@ -5,14 +5,14 @@ using namespace System.Management.Automation.Language
 using namespace PSMemo.Completers;
 
 class MemoCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterFactory {
-    [PSMemo.Completers.MemoCompletionsAttribute] $Completer;
+    [string] $Key;
 
-    MemoCompletionsAttribute([string] $keyParameter) {
-        $this.Completer = [PSMemo.Completers.MemoCompletionsAttribute]::new($keyParameter)
+    MemoCompletionsAttribute([string] $key) {
+        $this.Key = [string]::new($key)
     }
 
     [IArgumentCompleter] Create() {
-        return $this.Completer.Create()
+        return [MemoCompleter]::new($this.Key)
     }
 }
 
