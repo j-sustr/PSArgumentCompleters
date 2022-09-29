@@ -5,8 +5,8 @@ using namespace System.Management.Automation.Language
 using namespace PSMemo.Completers;
 
 class MemoCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterFactory {
-    [string] $Key;
-    [ScriptBlock] $KeyResolver;
+    [string] $Key
+    [ScriptBlock] $KeyResolver
 
     MemoCompletionsAttribute([string] $key) {
         $this.Key = $key
@@ -26,17 +26,34 @@ class MemoCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterF
 }
 
 class EnumCompleter : IArgumentCompleter {
+    [string] $EnvVariable
 
+    EnumCompleter([string] $envVariable) {
+        if ([string]::IsNullOrEmpty($envVariable)) {
+            throw [System.ArgumentException]::new('envVariable')
+        }
+        $this.EnvVariable = $envVariable
+    }
+
+    [IEnumerable[CompletionResult]] CompleteArgument($OptionalParameters) {
+        $values = [System.Environment]::GetEnvironmentVariable($this.EnvVariable) -split ';';
+
+        return $values | ForEach-Object {
+            [CompletionResult]::new($_)
+        }
+    }
 }
 
 class EnumCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterFactory {
+    [string] $EnvVariable
 
-
-    NumberCompletionsAttribute([string[]] $values) {
-        $this.Values = $values
+    NumberCompletionsAttribute([string] $envVariable) {
+        $this.EnvVariable = $envVariable
     }
 
-    [IArgumentCompleter] Create() { return [EnumCompleter]::new($this.Values) }
+    [IArgumentCompleter] Create() {
+        return [EnumCompleter]::new($this.EnvVariable)
+    }
 }
 
 
