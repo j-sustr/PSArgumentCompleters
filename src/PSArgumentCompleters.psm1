@@ -35,7 +35,13 @@ class EnumCompleter : IArgumentCompleter {
         $this.EnvVariable = $envVariable
     }
 
-    [IEnumerable[CompletionResult]] CompleteArgument($OptionalParameters) {
+    [IEnumerable[CompletionResult]] CompleteArgument(
+        [string] $CommandName,
+        [string] $parameterName,
+        [string] $wordToComplete,
+        [CommandAst] $commandAst,
+        [IDictionary] $fakeBoundParameters
+    ) {
         $values = [System.Environment]::GetEnvironmentVariable($this.EnvVariable) -split ';';
 
         return $values | ForEach-Object {
