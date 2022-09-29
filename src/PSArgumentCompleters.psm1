@@ -26,13 +26,11 @@ class MemoCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterF
 }
 
 class EnumCompleter : IArgumentCompleter {
-    [string] $EnvVariable
 
-    EnumCompleter([string] $envVariable) {
-        if ([string]::IsNullOrEmpty($envVariable)) {
-            throw [System.ArgumentException]::new('envVariable')
-        }
-        $this.EnvVariable = $envVariable
+    [int] $From
+
+    EnumCompleter([int] $from) {
+        $this.From = $from
     }
 
     [IEnumerable[CompletionResult]] CompleteArgument(
@@ -40,26 +38,24 @@ class EnumCompleter : IArgumentCompleter {
         [string] $parameterName,
         [string] $wordToComplete,
         [CommandAst] $commandAst,
-        [IDictionary] $fakeBoundParameters
-    ) {
-        $values = [System.Environment]::GetEnvironmentVariable($this.EnvVariable) -split ';';
+        [IDictionary] $fakeBoundParameters) {
 
-        return $values | ForEach-Object {
-            [CompletionResult]::new($_)
-        }
+        [string[]] $resultList = [System.Environment]::GetEnvironmentVariable('NpmConfigItems').Split(';')
+
+        $results = [Linq.Enumerable]::Select($resultList, [Func[string, CompletionResult]] { [CompletionResult]::new($args[0]) })
+
+        return $results
     }
 }
 
 class EnumCompletionsAttribute : ArgumentCompleterAttribute, IArgumentCompleterFactory {
-    [string] $EnvVariable
+    [int] $From
 
-    NumberCompletionsAttribute([string] $envVariable) {
-        $this.EnvVariable = $envVariable
+    EnumCompletionsAttribute([int] $from) {
+        $this.From = $from
     }
 
-    [IArgumentCompleter] Create() {
-        return [EnumCompleter]::new($this.EnvVariable)
-    }
+    [IArgumentCompleter] Create() { return [EnumCompleter]::new($this.From) }
 }
 
 
